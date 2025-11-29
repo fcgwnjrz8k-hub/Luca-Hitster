@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glücksrad</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      background: #ffffff;
+      padding: 24px 20px 28px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    p.description {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .wheel-container {
+      position: relative;
+      margin: 0 auto 16px;
+      width: 320px;
+      height: 320px;
+    }
+
+    canvas#wheel {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Pfeil rechts, der auf das Rad zeigt */
+    .pointer {
+      position: absolute;
+      top: 50%;
+      right: -24px;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 16px solid transparent;
+      border-bottom: 16px solid transparent;
+      border-left: 28px solid #e74c3c;
+    }
+
+    button#spinButton {
+      margin-top: 8px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: none;
+      background: #4a90e2;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+    }
+
+    button#spinButton:hover {
+      background: #3b7acc;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    }
+
+    button#spinButton:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    button#spinButton:disabled {
+      background: #cccccc;
+      box-shadow: none;
+      cursor: default;
+      transform: none;
+    }
+
+    .result {
+      margin-top: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      min-height: 1.4em;
+    }
+
+    @media (max-width: 480px) {
+      .app {
+        margin: 12px;
+        padding: 18px 14px 22px;
+      }
+      .wheel-container {
+        width: 260px;
+        height: 260px;
+      }
+      .pointer {
+        right: -18px;
+        border-top-width: 14px;
+        border-bottom-width: 14px;
+        border-left-width: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Glücksrad</h1>
+    <p class="description">
+      Klicke auf „Drehen“ und schau, auf welcher Kategorie das Rad landet.
+    </p>
+
+    <div class="wheel-container">
+      <canvas id="wheel" width="500" height="500"></canvas>
+      <div class="pointer"></div>
+    </div>
+
+    <button id="spinButton">Drehen</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // === HIER KANNST DU DEINE KATEGORIEN ANPASSEN ===
+    const categories = [
+      "Kategorie 1",
+      "Kategorie 2",
+      "Kategorie 3",
+      "Kategorie 4",
+      "Kategorie 5",
+      "Kategorie 6",
+      "Kategorie 7",
+      "Kategorie 8"
+    ];
+    // ================================================
+
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const spinButton = document.getElementById("spinButton");
+    const resultDiv = document.getElementById("result");
+
+    const numSegments = categories.length;
+    const arc = (2 * Math.PI) / numSegments;
+
+    // Farben für die Segmente
+    const colors = [
+      "#f1c40f",
+      "#e67e22",
+      "#e74c3c",
+      "#9b59b6",
+      "#3498db",
+      "#1abc9c",
+      "#2ecc71",
+      "#16a085",
+      "#8e44ad",
+      "#34495e"
+    ];
+
+    let rotation = 0;
+    let spinning = false;
+    let targetRotation = 0;
+    let startTime = null;
+    const spinDuration = 4000; // ms
+
+    function drawWheel() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 10;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Segmente zeichnen
+      for (let i = 0; i < numSegments; i++) {
+        const angleStart = i * arc + rotation;
+        const angleEnd = angleStart + arc;
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, angleStart, angleEnd);
+        ctx.closePath();
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+
+        // Text im Segment
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angleStart + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#000";
+        ctx.font = "16px sans-serif";
+        ctx.fillText(categories[i], radius - 12, 5);
+        ctx.restore();
+      }
+
+      // Kreis in der Mitte
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 40, 0, 2 * Math.PI);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#333333";
+      ctx.stroke();
+    }
+
+    function easeOutCubic(x) {
+      return 1 - Math.pow(1 - x, 3);
+    }
+
+    function animateSpin(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / spinDuration, 1);
+      const eased = easeOutCubic(progress);
+
+      rotation = eased * targetRotation;
+      drawWheel();
+
+      if (progress < 1) {
+        requestAnimationFrame(animateSpin);
+      } else {
+        spinning = false;
+        spinButton.disabled = false;
+      }
+    }
+
+    spinButton.addEventListener("click", () => {
+      if (spinning) return;
+
+      spinning = true;
+      spinButton.disabled = true;
+      startTime = null;
+      resultDiv.textContent = "Am Drehen...";
+
+      // Gewinner wählen
+      const winningIndex = Math.floor(Math.random() * numSegments);
+
+      // Zusätzliche Umdrehungen für den Effekt
+      const extraSpins = 5 + Math.floor(Math.random() * 3); // 5–7 Umdrehungen
+      targetRotation =
+        extraSpins * 2 * Math.PI - (winningIndex + 0.5) * arc;
+
+      requestAnimationFrame(animateSpin);
+
+      // Ergebnis kurz nach Ende anzeigen
+      setTimeout(() => {
+        resultDiv.textContent = "Ergebnis: " + categories[winningIndex];
+      }, spinDuration + 150);
+    });
+
+    // Anfangszeichnung
+    drawWheel();
+  </script>
+</body>
+</html>
