@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luca`s Hitster</title>
+  <title>Luca's Hitster</title>
   <style>
     * {
       box-sizing: border-box;
@@ -26,7 +26,7 @@
       padding: 24px 20px 28px;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      max-width: 480px;
+      max-width: 520px;
       width: 100%;
       text-align: center;
     }
@@ -39,12 +39,36 @@
     p.description {
       font-size: 0.9rem;
       color: #555;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+    }
+
+    .preset-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .preset-btn {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .preset-btn.active {
+      background: #4a90e2;
+      color: #fff;
+      border-color: #4a90e2;
     }
 
     .wheel-container {
       position: relative;
-      margin: 0 auto 16px;
+      margin: 0 auto 10px;
       width: 320px;
       height: 320px;
     }
@@ -55,7 +79,6 @@
       display: block;
     }
 
-    /* Pfeil rechts, der auf das Rad zeigt */
     .pointer {
       position: absolute;
       top: 50%;
@@ -68,9 +91,20 @@
       border-left: 28px solid #e74c3c;
     }
 
-    button#spinButton {
-      margin-top: 8px;
-      padding: 10px 20px;
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    #spinButton {
+      padding: 10px 22px;
       border-radius: 999px;
       border: none;
       background: #4a90e2;
@@ -82,26 +116,64 @@
       transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
     }
 
-    button#spinButton:hover {
+    #spinButton:hover {
       background: #3b7acc;
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
     }
 
-    button#spinButton:active {
+    #spinButton:active {
       transform: translateY(1px);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
-    button#spinButton:disabled {
+    #spinButton:disabled {
       background: #cccccc;
       box-shadow: none;
       cursor: default;
       transform: none;
     }
 
+    .speed-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: #555;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .speed-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
+
+    .speed-btn.active {
+      background: #4a90e2;
+      color: #fff;
+      border-color: #4a90e2;
+    }
+
+    #shuffleButton {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #ffffff;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    #shuffleButton:hover {
+      background: #f1f1f1;
+    }
+
     .result {
-      margin-top: 14px;
+      margin-top: 8px;
       font-size: 1rem;
       font-weight: 600;
       min-height: 1.4em;
@@ -127,43 +199,107 @@
 </head>
 <body>
   <div class="app">
-    <h1>Glücksrad</h1>
+    <h1>Luca's Hitster</h1>
     <p class="description">
-      Klicke auf „Drehen“ und schau, auf welcher Kategorie das Rad landet.
+      Wähle ein Rad, stell die Geschwindigkeit ein und klicke auf „Drehen“.
     </p>
+
+    <!-- Tabs für mehrere Glücksräder -->
+    <div class="preset-tabs">
+      <button class="preset-btn active" data-preset="classic">Classic</button>
+      <button class="preset-btn" data-preset="party">Party</button>
+      <button class="preset-btn" data-preset="challenges">Challenges</button>
+    </div>
 
     <div class="wheel-container">
       <canvas id="wheel" width="500" height="500"></canvas>
       <div class="pointer"></div>
     </div>
 
-    <button id="spinButton">Drehen</button>
+    <div class="controls">
+      <button id="spinButton">Drehen</button>
+
+      <div class="speed-controls">
+        <span>Geschwindigkeit:</span>
+        <button class="speed-btn active" data-speed="normal">Normal</button>
+        <button class="speed-btn" data-speed="slow">Langsam</button>
+        <button class="speed-btn" data-speed="epic">Epic</button>
+      </div>
+
+      <button id="shuffleButton">Shuffle Kategorien</button>
+    </div>
+
     <div class="result" id="result"></div>
   </div>
 
   <script>
-    // === HIER KANNST DU DEINE KATEGORIEN ANPASSEN ===
-    const categories = [
-      "Kategorie 1",
-      "Kategorie 2",
-      "Kategorie 3",
-      "Kategorie 4",
-      "Kategorie 5",
-      "Kategorie 6",
-      "Kategorie 7",
-      "Kategorie 8"
-    ];
-    // ================================================
+    // ========================
+    // 1. KATEGORIEN PRO RAD
+    // ========================
+    const presets = {
+      classic: [
+        "Kategorie 1",
+        "Kategorie 2",
+        "Kategorie 3",
+        "Kategorie 4",
+        "Kategorie 5",
+        "Kategorie 6",
+        "Kategorie 7",
+        "Kategorie 8"
+      ],
+      party: [
+        "Shot trinken",
+        "2 Schlücke",
+        "Regel aufstellen",
+        "Song singen",
+        "Tanz-Move zeigen",
+        "Jemand anders trinkt",
+        "Wahrheit",
+        "Pflicht"
+      ],
+      challenges: [
+        "Kompliment vergeben",
+        "Hitster-Song erraten",
+        "Alle klatschen",
+        "Freipass",
+        "Memes zeigen",
+        "Nächster bestimmt Kategorie",
+        "Selfie mit Runde",
+        "Alle trinken 1 Schluck"
+      ]
+    };
+
+    // ========================
+    // 2. AUDIO: TICK + JUBEL
+    // ========================
+    // WICHTIG:
+    // Lege in deinem GitHub-Repo zwei Dateien ab:
+    //  - tick.mp3   (kurzer "tick"-Sound)
+    //  - cheer.mp3  (Jubel / Applaus)
+    const tickSound = new Audio("tick.mp3");
+    tickSound.volume = 0.3;
+    const winSound = new Audio("cheer.mp3");
+    winSound.volume = 0.6;
+    let tickInterval = null;
+
+    // ========================
+    // 3. GRUNDLAGEN
+    // ========================
+    let currentPreset = "classic";
+    let categories = [...presets[currentPreset]];
 
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
     const spinButton = document.getElementById("spinButton");
+    const shuffleButton = document.getElementById("shuffleButton");
     const resultDiv = document.getElementById("result");
 
-    const numSegments = categories.length;
-    const arc = (2 * Math.PI) / numSegments;
+    const presetButtons = document.querySelectorAll(".preset-btn");
+    const speedButtons = document.querySelectorAll(".speed-btn");
 
-    // Farben für die Segmente
+    let numSegments = categories.length;
+    let arc = (2 * Math.PI) / numSegments;
+
     const colors = [
       "#f1c40f",
       "#e67e22",
@@ -181,7 +317,15 @@
     let spinning = false;
     let targetRotation = 0;
     let startTime = null;
-    const spinDuration = 4000; // ms
+
+    // Geschwindigkeits-Settings
+    let spinDuration = 4000; // normal
+    let extraSpinsBase = 5;  // Basisanzahl Umdrehungen
+
+    function updateDerived() {
+      numSegments = categories.length;
+      arc = (2 * Math.PI) / numSegments;
+    }
 
     function drawWheel() {
       const centerX = canvas.width / 2;
@@ -190,7 +334,6 @@
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Segmente zeichnen
       for (let i = 0; i < numSegments; i++) {
         const angleStart = i * arc + rotation;
         const angleEnd = angleStart + arc;
@@ -203,7 +346,6 @@
         ctx.fillStyle = colors[i % colors.length];
         ctx.fill();
 
-        // Text im Segment
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(angleStart + arc / 2);
@@ -228,6 +370,13 @@
       return 1 - Math.pow(1 - x, 3);
     }
 
+    function stopTickSound() {
+      if (tickInterval) {
+        clearInterval(tickInterval);
+        tickInterval = null;
+      }
+    }
+
     function animateSpin(timestamp) {
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
@@ -242,35 +391,115 @@
       } else {
         spinning = false;
         spinButton.disabled = false;
+        stopTickSound();
+        // Jubel-Sound am Ende
+        winSound.currentTime = 0;
+        winSound.play().catch(() => {});
       }
     }
 
+    // ========================
+    // 4. SPIN BUTTON
+    // ========================
     spinButton.addEventListener("click", () => {
-      if (spinning) return;
+      if (spinning || numSegments === 0) return;
 
       spinning = true;
       spinButton.disabled = true;
       startTime = null;
       resultDiv.textContent = "Am Drehen...";
 
-      // Gewinner wählen
+      // Gewinner vorab bestimmen
       const winningIndex = Math.floor(Math.random() * numSegments);
 
-      // Zusätzliche Umdrehungen für den Effekt
-      const extraSpins = 5 + Math.floor(Math.random() * 3); // 5–7 Umdrehungen
-      targetRotation =
-        extraSpins * 2 * Math.PI - (winningIndex + 0.5) * arc;
+      const extraSpins = extraSpinsBase + Math.floor(Math.random() * 3);
+      targetRotation = extraSpins * 2 * Math.PI - (winningIndex + 0.5) * arc;
+
+      // Tick-Tick-Tick während des Spins
+      stopTickSound();
+      tickInterval = setInterval(() => {
+        // Für jeden Tick eine kurze Kopie abspielen,
+        // damit der Sound sich überlagern kann
+        const t = tickSound.cloneNode();
+        t.play().catch(() => {});
+      }, 80);
 
       requestAnimationFrame(animateSpin);
 
-      // Ergebnis kurz nach Ende anzeigen
+      // Ergebnis nach SpinDuration anzeigen
       setTimeout(() => {
         resultDiv.textContent = "Ergebnis: " + categories[winningIndex];
       }, spinDuration + 150);
     });
 
-    // Anfangszeichnung
+    // ========================
+    // 5. PRESET-WECHSEL
+    // ========================
+    function setActivePresetButton(activeBtn) {
+      presetButtons.forEach(btn => btn.classList.remove("active"));
+      activeBtn.classList.add("active");
+    }
+
+    presetButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (spinning) return;
+        const presetName = btn.dataset.preset;
+        currentPreset = presetName;
+        categories = [...presets[currentPreset]];
+        updateDerived();
+        setActivePresetButton(btn);
+        resultDiv.textContent = "";
+        rotation = 0;
+        targetRotation = 0;
+        drawWheel();
+      });
+    });
+
+    // ========================
+    // 6. SPEED BUTTONS
+    // ========================
+    function setActiveSpeedButton(activeBtn) {
+      speedButtons.forEach(btn => btn.classList.remove("active"));
+      activeBtn.classList.add("active");
+    }
+
+    speedButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const speed = btn.dataset.speed;
+        if (speed === "slow") {
+          spinDuration = 2500;
+          extraSpinsBase = 4;
+        } else if (speed === "normal") {
+          spinDuration = 4000;
+          extraSpinsBase = 5;
+        } else if (speed === "epic") {
+          spinDuration = 7000;
+          extraSpinsBase = 7;
+        }
+        setActiveSpeedButton(btn);
+      });
+    });
+
+    // ========================
+    // 7. SHUFFLE-BUTTON
+    // ========================
+    shuffleButton.addEventListener("click", () => {
+      if (spinning) return;
+      // Fisher–Yates Shuffle
+      for (let i = categories.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [categories[i], categories[j]] = [categories[j], categories[i]];
+      }
+      updateDerived();
+      drawWheel();
+      resultDiv.textContent = "Kategorien gemischt.";
+    });
+
+    // Erste Zeichnung
+    updateDerived();
     drawWheel();
   </script>
 </body>
 </html>
+
+   
