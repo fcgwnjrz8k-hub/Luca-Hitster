@@ -179,6 +179,65 @@
       min-height: 1.4em;
     }
 
+    /* TIMER-STYLES */
+    .timer-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: #555;
+      margin-top: 10px;
+    }
+
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .timer-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
+
+    .timer-btn.active {
+      background: #4a90e2;
+      color: #fff;
+      border-color: #4a90e2;
+    }
+
+    #timerDisplay {
+      font-family: monospace;
+      font-size: 1.1rem;
+      margin-top: 4px;
+    }
+
+    .timer-finished {
+      color: #e74c3c;
+      font-weight: 700;
+    }
+
+    #timerStartButton {
+      margin-top: 6px;
+      padding: 6px 18px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    #timerStartButton:hover {
+      background: #f1f1f1;
+    }
+
     @media (max-width: 480px) {
       .app {
         margin: 12px;
@@ -226,6 +285,19 @@
         <button class="speed-btn" data-speed="epic">Epic</button>
       </div>
 
+      <!-- TIMER -->
+      <div class="timer-block">
+        <div class="timer-row">
+          <span>Timer:</span>
+          <button class="timer-btn active" data-time="30">30s</button>
+          <button class="timer-btn" data-time="60">60s</button>
+          <button class="timer-btn" data-time="90">90s</button>
+        </div>
+
+        <div id="timerDisplay">00:30</div>
+        <button id="timerStartButton">Timer starten</button>
+      </div>
+
       <button id="shuffleButton">Shuffle Kategorien</button>
     </div>
 
@@ -247,16 +319,16 @@
       ],
       party: [
         "Songtitel",
-        "Interpret Name",
+        "Interpret-Name",
         "Erscheinungsjahr +/-2",
-        "Debüt?",
+        "Debüthit?",
         "Größter Hit?",
         "Kontinent?",
         "Charts Top 10?",
       ],
       challenges: [
         "Erscheinungsjahr",
-        "ALter beim Release",
+        "Alter beim Release",
         "Beruf vor Karriere",
         "Spotify Streams?",
         "Jahreszeit?",
@@ -316,6 +388,74 @@
     // Geschwindigkeits-Settings
     let spinDuration = 4000; // normal
     let extraSpinsBase = 5;  // Basisanzahl Umdrehungen
+
+    // ========================
+    // TIMER VARIABLEN
+    // ========================
+    const timerButtons = document.querySelectorAll(".timer-btn");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const timerStartButton = document.getElementById("timerStartButton");
+
+    let roundDuration = 30;       // Standard: 30 Sekunden
+    let timerRemaining = 30;
+    let timerInterval = null;
+
+    function formatTime(s) {
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return (
+        String(m).padStart(2, "0") + ":" + String(sec).padStart(2, "0")
+      );
+    }
+
+    function updateTimerDisplay() {
+      timerDisplay.textContent = formatTime(timerRemaining);
+    }
+
+    function resetTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerRemaining = roundDuration;
+      updateTimerDisplay();
+      timerDisplay.classList.remove("timer-finished");
+    }
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+
+      timerRemaining = roundDuration;
+      updateTimerDisplay();
+      timerDisplay.classList.remove("timer-finished");
+
+      timerInterval = setInterval(() => {
+        timerRemaining--;
+
+        if (timerRemaining <= 0) {
+          timerRemaining = 0;
+          updateTimerDisplay();
+          timerDisplay.classList.add("timer-finished");
+          clearInterval(timerInterval);
+        } else {
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
+
+    function setActiveTimerButton(activeBtn) {
+      timerButtons.forEach(btn => btn.classList.remove("active"));
+      activeBtn.classList.add("active");
+    }
+
+    timerButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        roundDuration = parseInt(btn.dataset.time, 10);
+        setActiveTimerButton(btn);
+        resetTimer();
+      });
+    });
+
+    timerStartButton.addEventListener("click", () => {
+      startTimer();
+    });
 
     function updateDerived() {
       numSegments = categories.length;
@@ -413,8 +553,6 @@
       // Tick-Tick-Tick während des Spins
       stopTickSound();
       tickInterval = setInterval(() => {
-        // Für jeden Tick eine kurze Kopie abspielen,
-        // damit der Sound sich überlagern kann
         const t = tickSound.cloneNode();
         t.play().catch(() => {});
       }, 80);
@@ -490,11 +628,13 @@
       resultDiv.textContent = "Kategorien gemischt.";
     });
 
-    // Erste Zeichnung
+    // Erste Zeichnung + Timer-Anzeige
     updateDerived();
     drawWheel();
+    updateTimerDisplay();
   </script>
 </body>
 </html>
+
 
    
