@@ -13,8 +13,8 @@
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
-      color: #222;
+      background: #0b0b15; /* leicht dunkler, damit das Neon-Logo besser wirkt */
+      color: #f8f8ff;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -22,23 +22,37 @@
     }
 
     .app {
-      background: #ffffff;
+      background: radial-gradient(circle at top, #1b1b30 0%, #050510 70%);
       padding: 24px 20px 28px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
       max-width: 520px;
       width: 100%;
       text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     h1 {
       font-size: 1.5rem;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    /* LOGO unter dem Titel */
+    .logo {
+      width: 140px;
+      max-width: 60%;
+      margin: 4px auto 12px;
+      display: block;
+      border-radius: 24px;
+      box-shadow:
+        0 0 18px rgba(0, 255, 255, 0.35),
+        0 0 28px rgba(255, 0, 255, 0.25);
     }
 
     p.description {
       font-size: 0.9rem;
-      color: #555;
+      color: #c9ccff;
       margin-bottom: 12px;
     }
 
@@ -53,17 +67,56 @@
     .preset-btn {
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fafafa;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(10, 10, 25, 0.9);
       font-size: 0.8rem;
       cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+      color: #e4e6ff;
+      transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.08s ease;
     }
 
-    .preset-btn.active {
-      background: #4a90e2;
-      color: #fff;
-      border-color: #4a90e2;
+    .preset-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+    }
+
+    /* Farbcodierung: weich Grün / Blau / Rot */
+    .level-easy {
+      border-color: rgba(129, 230, 217, 0.4);
+      color: #b9f6ca;
+    }
+    .level-easy.active {
+      background: linear-gradient(135deg, #6bd88b, #4ac3a3);
+      color: #04140b;
+      border-color: transparent;
+      box-shadow: 0 0 12px rgba(75, 201, 141, 0.8);
+    }
+
+    .level-mid {
+      border-color: rgba(144, 202, 249, 0.4);
+      color: #bbdefb;
+    }
+    .level-mid.active {
+      background: linear-gradient(135deg, #6bb6ff, #4a90e2);
+      color: #04101c;
+      border-color: transparent;
+      box-shadow: 0 0 12px rgba(80, 155, 255, 0.8);
+    }
+
+    .level-hard {
+      border-color: rgba(255, 138, 128, 0.4);
+      color: #ffcccb;
+    }
+    .level-hard.active {
+      background: linear-gradient(135deg, #ff7b7b, #ff6b9c);
+      color: #2b0505;
+      border-color: transparent;
+      box-shadow: 0 0 12px rgba(255, 120, 140, 0.8);
     }
 
     .wheel-container {
@@ -77,6 +130,7 @@
       width: 100%;
       height: 100%;
       display: block;
+      filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.7));
     }
 
     .pointer {
@@ -88,7 +142,8 @@
       height: 0;
       border-top: 16px solid transparent;
       border-bottom: 16px solid transparent;
-      border-left: 28px solid #e74c3c;
+      border-left: 28px solid #ffb347;
+      filter: drop-shadow(0 0 8px rgba(255, 179, 71, 0.8));
     }
 
     .controls {
@@ -107,28 +162,31 @@
       padding: 10px 22px;
       border-radius: 999px;
       border: none;
-      background: #4a90e2;
+      background: linear-gradient(135deg, #7f5af0, #2cb9ff);
       color: #fff;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      box-shadow:
+        0 4px 14px rgba(0, 0, 0, 0.5),
+        0 0 14px rgba(127, 90, 240, 0.7);
       transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
     }
 
     #spinButton:hover {
-      background: #3b7acc;
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+      box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.6),
+        0 0 18px rgba(127, 90, 240, 0.9);
     }
 
     #spinButton:active {
       transform: translateY(1px);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
     }
 
     #spinButton:disabled {
-      background: #cccccc;
+      background: #555a7a;
       box-shadow: none;
       cursor: default;
       transform: none;
@@ -139,7 +197,7 @@
       align-items: center;
       gap: 6px;
       font-size: 0.78rem;
-      color: #555;
+      color: #c9ccff;
       flex-wrap: wrap;
       justify-content: center;
     }
@@ -147,29 +205,35 @@
     .speed-btn {
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fafafa;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(15, 18, 40, 0.9);
       cursor: pointer;
       font-size: 0.78rem;
+      color: #e1e4ff;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     .speed-btn.active {
       background: #4a90e2;
       color: #fff;
       border-color: #4a90e2;
+      box-shadow: 0 0 10px rgba(74, 144, 226, 0.8);
     }
 
     #shuffleButton {
       padding: 6px 16px;
       border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(10, 18, 40, 0.9);
       font-size: 0.85rem;
       cursor: pointer;
+      color: #e4e7ff;
+      transition: background 0.15s ease, box-shadow 0.15s ease;
     }
 
     #shuffleButton:hover {
-      background: #f1f1f1;
+      background: rgba(40, 50, 90, 0.95);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
     }
 
     .result {
@@ -177,6 +241,7 @@
       font-size: 1rem;
       font-weight: 600;
       min-height: 1.4em;
+      color: #fdfdff;
     }
 
     /* TIMER-STYLES */
@@ -186,7 +251,7 @@
       align-items: center;
       gap: 4px;
       font-size: 0.8rem;
-      color: #555;
+      color: #c9ccff;
       margin-top: 10px;
     }
 
@@ -201,41 +266,48 @@
     .timer-btn {
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fafafa;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(12, 18, 40, 0.9);
       cursor: pointer;
       font-size: 0.78rem;
+      color: #e1e4ff;
     }
 
     .timer-btn.active {
-      background: #4a90e2;
+      background: #7f5af0;
       color: #fff;
-      border-color: #4a90e2;
+      border-color: #7f5af0;
+      box-shadow: 0 0 10px rgba(127, 90, 240, 0.8);
     }
 
     #timerDisplay {
       font-family: monospace;
       font-size: 1.1rem;
       margin-top: 4px;
+      color: #fefefe;
     }
 
     .timer-finished {
-      color: #e74c3c;
+      color: #ff7676;
       font-weight: 700;
+      text-shadow: 0 0 10px rgba(255, 118, 118, 0.8);
     }
 
     #timerStartButton {
       margin-top: 6px;
       padding: 6px 18px;
       border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(15, 20, 50, 0.9);
       cursor: pointer;
       font-size: 0.85rem;
+      color: #e4e7ff;
+      transition: background 0.15s ease, box-shadow 0.15s ease;
     }
 
     #timerStartButton:hover {
-      background: #f1f1f1;
+      background: rgba(40, 55, 110, 0.95);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
     }
 
     @media (max-width: 480px) {
@@ -253,21 +325,27 @@
         border-bottom-width: 14px;
         border-left-width: 22px;
       }
+      .logo {
+        width: 110px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <h1>Luca's Hitster</h1>
+    <!-- Logo-Datei im Repo: Hitster.png -->
+    <img src="Hitster.png" class="logo" alt="Luca's Hitster Logo" />
+
     <p class="description">
       Wähle ein Rad, stell die Geschwindigkeit ein und klicke auf „Drehen“.
     </p>
 
     <!-- Tabs für mehrere Glücksräder -->
     <div class="preset-tabs">
-      <button class="preset-btn active" data-preset="classic">Einfach</button>
-      <button class="preset-btn" data-preset="party">Fortgeschritten</button>
-      <button class="preset-btn" data-preset="challenges">Extrem</button>
+      <button class="preset-btn level-easy active" data-preset="classic">Einfach</button>
+      <button class="preset-btn level-mid" data-preset="party">Fortgeschritten</button>
+      <button class="preset-btn level-hard" data-preset="challenges">Extrem</button>
     </div>
 
     <div class="wheel-container">
@@ -339,10 +417,6 @@
     // ========================
     // 2. AUDIO: TICK + JUBEL
     // ========================
-    // WICHTIG:
-    // Lege in deinem GitHub-Repo zwei Dateien ab:
-    //  - tick.mp3   (kurzer "tick"-Sound)
-    //  - cheer.mp3  (Jubel / Applaus)
     const tickSound = new Audio("tick.mp3");
     tickSound.volume = 0.3;
     const winSound = new Audio("cheer.mp3");
@@ -485,7 +559,7 @@
         ctx.translate(centerX, centerY);
         ctx.rotate(angleStart + arc / 2);
         ctx.textAlign = "right";
-        ctx.fillStyle = "#000";
+        ctx.fillStyle = "#fff";
         ctx.font = "16px sans-serif";
         ctx.fillText(categories[i], radius - 12, 5);
         ctx.restore();
@@ -494,10 +568,10 @@
       // Kreis in der Mitte
       ctx.beginPath();
       ctx.arc(centerX, centerY, 40, 0, 2 * Math.PI);
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#101326";
       ctx.fill();
       ctx.lineWidth = 2;
-      ctx.strokeStyle = "#333333";
+      ctx.strokeStyle = "#6f73ff";
       ctx.stroke();
     }
 
@@ -635,6 +709,7 @@
   </script>
 </body>
 </html>
+
 
 
    
